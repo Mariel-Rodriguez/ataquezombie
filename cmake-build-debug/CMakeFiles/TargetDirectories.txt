@@ -1,0 +1,3 @@
+C:/Users/Kevin/Desktop/informatica 2/cmake-build-debug/CMakeFiles/informatica2.dir
+C:/Users/Kevin/Desktop/informatica 2/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/Kevin/Desktop/informatica 2/cmake-build-debug/CMakeFiles/rebuild_cache.dir
