@@ -12,6 +12,8 @@
 
 #include <vector>
 #include <ctime>
+#include <sstream>
+
 using namespace sf;
 using namespace std;
 
@@ -19,20 +21,31 @@ class Juego {
 
 private:
 
+    //Generales
     RenderWindow * ventana1;
     Event event;
     VideoMode videoMode;
+    Event *evento;
 
     //Funciones para valores por defecto para abrir la ventana
     void inicializarVariables();
     void iniciarVentana();
-    void inicializarEnemigos();
+    void inicializarFont();
+    void inicializarTexto();
     void inicializarFondo();
+    void inicializarMira();
     void inicializarZombies1();
     void inicializarZombies2();
     void inicializarZombies3();
+
     //Para los frames y ande en cualquier pc
     int fps;
+
+    //Resources utilizados
+    Font font;
+
+    //Texto
+    Text uiText;
 
 
     //Logica de juego
@@ -78,12 +91,15 @@ public:
 
     void pollEvents();
     void updateMousePos();
+    void procesarMovimiento();
 
+    void updateTexto();
     void updateEnemigos();
     void update();
 
+    void renderTexto(RenderTarget &target);
     void render();
-    void renderEnemigos();
+    void renderEnemigos(RenderTarget &target);
 
 
 };

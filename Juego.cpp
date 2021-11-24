@@ -12,7 +12,7 @@ void Juego::inicializarVariables() {
     this->puntos = 0;
     this->enemySpawnTimerMax = 10.f;
     this->enemySpawnTimer = this->enemySpawnTimerMax;
-    this->maxEnemigos = 8;
+    this->maxEnemigos = 6;
     this->mouseHeld = false;
     this->vida = 10;
     this->finDelJuego= false;
@@ -23,8 +23,8 @@ void Juego::iniciarVentana() {
 
     fps = 60;
 
-    this->videoMode.height = 600;
-    this->videoMode.width = 800;
+    this->videoMode.height = 768;
+    this->videoMode.width = 1024;
     this->ventana1 = new RenderWindow(this->videoMode ,"ZombieLand-Info-2-Proyect",Style::Titlebar | Style::Close);
 
     this->ventana1->setFramerateLimit(fps);
@@ -50,6 +50,12 @@ void Juego::inicializarZombies3() {
     this->spr_zombie3.setTexture(txt_zombie3);
     this->spr_zombie3.setPosition(400.f,150.f);
     this->spr_zombie3.setScale(0.1f,0.1f);
+}
+
+void Juego::inicializarMira(){
+    this->txt_mira.loadFromFile("./Imagenes/mira1.png");
+    this->spr_mira.setTexture(txt_mira);
+    this->spr_mira.setScale(0.15f,0.15f);
 }
 
 void Juego::spawnEnemigos() {
@@ -84,6 +90,36 @@ void Juego::spawnEnemigos() {
         );
     }
 
+    //Randomizar el tamaño de los enemigos
+    int tamanio = rand() % 3;
+
+    switch (tamanio) {
+        case 0:
+            this->spr_zombie1.setScale(0.2f,0.2f);
+            this->spr_zombie2.setScale(0.2f,0.2f);
+            this->spr_zombie3.setScale(0.3f,0.3f);
+            break;
+        case 1:
+            this->spr_zombie1.setScale(0.2f,0.2f);
+            this->spr_zombie2.setScale(0.1f,0.1f);
+            this->spr_zombie3.setScale(0.35f,0.35f);
+            break;
+        case 2:
+            this->spr_zombie1.setScale(0.3f,0.3f);
+            this->spr_zombie2.setScale(0.15f,0.15f);
+            this->spr_zombie3.setScale(0.1f,0.1f);
+            break;
+        case 3:
+            this->spr_zombie1.setScale(0.23f,0.23f);
+            this->spr_zombie2.setScale(0.25f,0.25f);
+            this->spr_zombie3.setScale(0.4f,0.4f);
+            break;
+        default:
+            this->spr_zombie1.setScale(0.2f,0.2f);
+            this->spr_zombie2.setScale(0.1f,0.1f);
+            this->spr_zombie3.setScale(0.1f,0.1f);
+            break;
+    }
 
     //Spawnea el enemigo
     this->spr_enemigos.push_back(this->spr_zombie1);
@@ -98,9 +134,17 @@ void Juego::inicializarFondo() {
     this->spr_fondo.setTexture(txt_fondo);
 }
 
-void Juego::inicializarEnemigos() {
+void Juego::inicializarFont(){
+    if(this->font.loadFromFile("./Fonts/Dosis-Light.ttf")){
+     cout<<"ERROR::JUEGO::INICIALIZACION_FONTS:Fallo al intentar cargar el font"<<"\n";
+    }
+}
 
-
+void Juego::inicializarTexto() {
+    this->uiText.setFont(this->font);
+    this->uiText.setCharacterSize(30);
+    this->uiText.setFillColor(Color::White);
+    this->uiText.setString("NADA");
 }
 
 
@@ -113,6 +157,9 @@ Juego::Juego() {
     this->inicializarVariables();
     this->iniciarVentana();
     this->inicializarFondo();
+    this->inicializarFont();
+    this->inicializarTexto();
+    this->inicializarMira();
     this->inicializarZombies1();
     this->inicializarZombies2();
     this->inicializarZombies3();
@@ -135,6 +182,10 @@ void Juego::pollEvents() {
             case Event::Closed:
                 this->ventana1->close();
                 break;
+            case Event::MouseMoved:
+                spr_mira.setPosition((Vector2f)Mouse::getPosition(*ventana1));
+                break;
+
             case Event::KeyPressed:
                 if(this->event.key.code==sf::Keyboard::Escape){
                     this->ventana1->close();
@@ -144,6 +195,7 @@ void Juego::pollEvents() {
     }
 }
 
+
 void Juego::updateMousePos() {
 
     //Actualizar la posicion del mouse
@@ -152,8 +204,25 @@ void Juego::updateMousePos() {
 
     //Posicion relativa del mouse con respecto a la ventana
 
+
+
     this->mousePosWindow = Mouse::getPosition(*this->ventana1);
     this->mousePosView = this->ventana1->mapPixelToCoords(mousePosWindow);
+
+    //Ocultar el mouse y hacerlo mira
+    ventana1->setMouseCursorVisible(false);
+    evento = new Event;
+
+}
+
+void Juego::updateTexto() {
+
+    stringstream ss;
+
+    ss<<"Puntos: "<<this->puntos <<"\n"
+      <<"Vida: " << this->vida << "\n";
+
+    this->uiText.setString(ss.str());
 }
 
 void Juego::updateEnemigos() {
@@ -202,13 +271,15 @@ void Juego::updateEnemigos() {
 
                 if(this->spr_enemigos[i].getGlobalBounds().contains(this->mousePosView)){
 
-                    //Borrar el enemigo
-                    deleted = true;
-                    this->spr_enemigos.erase(this->spr_enemigos.begin() + i);
 
                     //Obtener puntos
                     this->puntos += 1;
                     cout<<"Puntos: "<<this->puntos <<"\n";
+
+
+                    //Borrar el enemigo
+                    deleted = true;
+                    this->spr_enemigos.erase(this->spr_enemigos.begin() + i);
                 }
 
 
@@ -226,7 +297,10 @@ void Juego::update() {
     this->pollEvents();
 
     if(this->finDelJuego == false){
+
         this->updateMousePos();
+
+        this->updateTexto();
 
         this->updateEnemigos();
     }
@@ -239,10 +313,14 @@ void Juego::update() {
 
 }
 
-void Juego::renderEnemigos() {
+void Juego::renderTexto(RenderTarget &target){
+    target.draw(this->uiText);
+}
+
+void Juego::renderEnemigos(RenderTarget &target) {
     //Renderizando los enemigos
     for (auto &e : this->spr_enemigos) {
-        this->ventana1->draw(e);
+        target.draw(e);
     }
 }
 
@@ -264,7 +342,10 @@ void Juego::render() {
     //this->ventana1->draw(this->spr_zombie1);
     //this->ventana1->draw(this->spr_zombie2);
     //this->ventana1->draw(this->spr_zombie3);
-    this->renderEnemigos();
+    this->ventana1->draw(this->spr_mira);
+    this->renderEnemigos(*this->ventana1);
+
+    this->renderTexto(*this->ventana1);
 
     this->ventana1->display();
 }
