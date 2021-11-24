@@ -36,17 +36,16 @@ private:
 
 
     //Logica de juego
-    int puntos;
+    bool finDelJuego;
+    unsigned puntos;
+    int vida;
     float enemySpawnTimer;
     float enemySpawnTimerMax;
     int maxEnemigos;
+    bool mouseHeld;
 
     //Objetos de juego
-    vector<Texture> txt_enemigos;
     vector<Sprite> spr_enemigos;
-    vector<RectangleShape> enemies;
-
-    RectangleShape enemigo;
 
     Texture txt_fondo;
     Sprite spr_fondo;
@@ -63,6 +62,7 @@ private:
 
     //Posiciones del mouse
     Vector2i mousePosWindow;
+    Vector2f mousePosView;
 
 
 public:
@@ -71,6 +71,7 @@ public:
 
     //Accesores
     const bool running() const;
+    const bool getFinDeJuego() const;
 
     //Funciones activas
     void spawnEnemigos();

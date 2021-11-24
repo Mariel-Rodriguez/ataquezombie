@@ -15,7 +15,7 @@ int main(int argc, char *args[]) {
     Juego juego;
 
     //Aca loopeo el juego (Se sale con escape)
-    while (juego.running()) {
+    while (juego.running() && !juego.getFinDeJuego()) {
         //Update
         juego.update();
         //Render
